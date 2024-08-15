@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sizeContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/sizeTextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/add_size"
+        app:endIconMode="clear_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:digits="0123456789/"
+            android:maxLength="10" />
+    </com.google.android.material.textfield.TextInputLayout>
+</RelativeLayout>

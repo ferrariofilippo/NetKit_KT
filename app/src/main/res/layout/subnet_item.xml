@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subnetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp">
+
+    <TextView
+        android:id="@+id/networkAddressLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/network"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/networkAddressValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/networkAddressLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:id="@+id/broadcastAddressLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/networkAddressLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/broadcast"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/broadcastAddressValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/networkAddressValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/broadcastAddressLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:id="@+id/subnetMaskLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/broadcastAddressLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/subnet_mask"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/subnetMaskValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/broadcastAddressValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/subnetMaskLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:id="@+id/hostCountLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/subnetMaskLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/hosts_count"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/hostCountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/subnetMaskValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/subnetMaskLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/subnetDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hostCountLabel"
+        android:layout_marginTop="12dp"
+        android:foreground="?attr/colorAccent" />
+</RelativeLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wildcardContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp">
+
+    <TextView
+        android:id="@+id/wildcardMaskLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/network"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/wildcardMaskValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/wildcardMaskLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:id="@+id/supportIPLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wildcardMaskLabel"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="12dp"
+        android:text="@string/broadcast"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+    <TextView
+        android:id="@+id/supportIPValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wildcardMaskValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/supportIPLabel"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/subnetDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/supportIPLabel"
+        android:layout_marginTop="12dp"
+        android:foreground="?attr/colorAccent" />
+</RelativeLayout>

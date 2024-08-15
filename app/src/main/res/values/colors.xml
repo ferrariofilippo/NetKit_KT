@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<resources>
+    <color name="red_50">#FFFBE8E6</color>
+    <color name="red_100">#FFFFCBBA</color>
+    <color name="red_200">#FFFFA98E</color>
+    <color name="red_300">#FFFF8760</color>
+    <color name="red_400">#FFFF6C3D</color>
+    <color name="red_500">#FFFE5218</color>
+    <color name="red_600">#FFF34C14</color>
+    <color name="red_700">#FFE5450E</color>
+    <color name="red_800">#FFD83E09</color>
+    <color name="red_900">#FFBF3000</color>
+
+    <color name="cyan_50">#FFE2F6FA</color>
+    <color name="cyan_100">#FFB5E7F2</color>
+    <color name="cyan_200">#FF86D8EB</color>
+    <color name="cyan_300">#FF5CC8E4</color>
+    <color name="cyan_400">#FF3CBCE1</color>
+    <color name="cyan_500">#FF1EB0DF</color>
+    <color name="cyan_600">#FF13A2D1</color>
+    <color name="cyan_700">#FF008FBF</color>
+    <color name="cyan_800">#FF017EAC</color>
+    <color name="cyan_900">#FF005E8B</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

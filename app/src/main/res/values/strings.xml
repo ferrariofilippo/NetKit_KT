@@ -1,0 +1,37 @@
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<resources>
+    <string name="app_name">NetKit</string>
+    <string name="subnets">Subnets</string>
+    <string name="tools">Tools</string>
+    <string name="wildcards">Wildcards</string>
+    <string name="logo">NetKit\'s logo</string>
+    <string name="about">About</string>
+    <string name="choose_ip_version">Choose an IP version:</string>ù
+    <string name="ip4">IPv4</string>
+    <string name="ip6">IPv6</string>
+    <string name="compute">Compute</string>
+    <string name="add_size">Add size:</string>
+    <string name="network">Network</string>
+    <string name="subnet_mask">Subnet mask</string>
+    <string name="broadcast">Broadcast</string>
+    <string name="hosts_count">Hosts count</string>
+    <string name="sizes">Sizes</string>
+    <string name="reset">Reset</string>
+    <string name="enter_ipv6">IPv6 base address:</string>
+    <string name="subnets_count_ipv6">IPv6 subnets count:</string>
+    <string name="global_routing_prefix">Global routing prefix:</string>
+    <string name="choose_a_method">Choose a method:</string>
+    <string name="lower_bound">Lower bound</string>
+    <string name="upper_bound">Upper bound</string>
+    <string name="wildcard_network_hint">Network address</string>
+    <string name="range">Range</string>
+    <string name="greater">Greater</string>
+    <string name="smaller">Smaller</string>
+    <string name="even">Even</string>
+    <string name="odd">Odd</string>
+    <string name="class_string">Class</string>
+    <string name="wildcard_mask">Wildcard mask</string>
+    <string name="support_ip">Support IP</string>
+    <string name="choose_class">Choose a class</string>
+</resources>
