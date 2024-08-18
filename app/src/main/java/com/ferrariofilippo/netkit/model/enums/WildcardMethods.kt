@@ -3,7 +3,7 @@ package com.ferrariofilippo.netkit.model.enums
 enum class WildcardMethods {
     Range,
     Lower,
-    Upper,
+    Greater,
     Even,
     Odd,
     Network,

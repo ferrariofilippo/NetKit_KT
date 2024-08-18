@@ -21,15 +21,15 @@ object MathUtil {
     }
 
     fun getCeilBaseTwoLog(n: UInt): Int {
-        var index = 0
-        while (n > powersOfTwo[index++]);
+        var index = -1
+        while (index < BITS_IN_IPv4_ADDRESS && n > powersOfTwo[++index]);
 
-        return --index
+        return index
     }
 
     fun getFloorBaseTwoLog(n: UInt): Int {
         var index = BITS_IN_IPv4_ADDRESS
-        while (n < powersOfTwo[--index]);
+        while (index > 0 && n < powersOfTwo[--index]);
 
         return index
     }

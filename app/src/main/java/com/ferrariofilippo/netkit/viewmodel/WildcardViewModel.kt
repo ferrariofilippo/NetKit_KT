@@ -20,6 +20,7 @@ import com.ferrariofilippo.netkit.model.data.Bounds
 import com.ferrariofilippo.netkit.model.enums.NetworkClass
 import com.ferrariofilippo.netkit.model.enums.WildcardMethods
 import com.ferrariofilippo.netkit.util.IPv4Util
+import com.ferrariofilippo.netkit.util.ValidationUtil.defaultValidationFun
 import com.ferrariofilippo.netkit.util.WildcardUtil
 
 class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
@@ -38,14 +39,18 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
 
     val wildcardMethods = arrayOf(
         app.getString(R.string.range),
-        app.getString(R.string.lower_bound),
-        app.getString(R.string.upper_bound),
+        app.getString(R.string.smaller),
+        app.getString(R.string.greater),
         app.getString(R.string.even),
         app.getString(R.string.odd),
         app.getString(R.string.network),
         app.getString(R.string.class_string)
     )
     val networkClasses = NetworkClass.entries.toTypedArray()
+
+    var validateLowerBound: (error: Boolean) -> Unit = ::defaultValidationFun
+    var validateUpperBound: (error: Boolean) -> Unit = ::defaultValidationFun
+    var validateNetworkString: (error: Boolean) -> Unit = ::defaultValidationFun
 
     // Overrides
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
@@ -59,12 +64,12 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
     // Bindings
     @Bindable
     fun getShowLowerBound(): Boolean {
-        return _wildcardMethod == WildcardMethods.Lower || _wildcardMethod == WildcardMethods.Range
+        return _wildcardMethod == WildcardMethods.Greater || _wildcardMethod == WildcardMethods.Range
     }
 
     @Bindable
     fun getShowUpperBound(): Boolean {
-        return _wildcardMethod == WildcardMethods.Upper || _wildcardMethod == WildcardMethods.Range
+        return _wildcardMethod == WildcardMethods.Lower || _wildcardMethod == WildcardMethods.Range
     }
 
     @Bindable
@@ -101,6 +106,7 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
     fun setLowerBound(value: Long) {
         if (value != _lowerBound) {
             _lowerBound = value
+            validateLowerBound(false)
             notifyPropertyChanged(BR.lowerBound)
         }
     }
@@ -113,6 +119,7 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
     fun setUpperBound(value: Long) {
         if (value != _upperBound) {
             _upperBound = value
+            validateUpperBound(false)
             notifyPropertyChanged(BR.upperBound)
         }
     }
@@ -125,6 +132,7 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
     fun setNetworkString(value: String) {
         if (value != _networkString) {
             _networkString = value
+            validateNetworkString(false)
             notifyPropertyChanged(BR.networkString)
         }
     }
@@ -155,13 +163,6 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
 
     // Methods
     @SuppressLint("NotifyDataSetChanged")
-    fun setAdapter(adapter: WildcardItemAdapter) {
-        _recyclerAdapter = adapter
-        _recyclerAdapter.submitList(_aces)
-        _recyclerAdapter.notifyDataSetChanged()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
     fun compute() {
         val networkAddress = Array<UByte>(4) { 0u }
         val addressAndPrefixLength = _networkString.split('/', '\\')
@@ -169,7 +170,22 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
             if (addressAndPrefixLength.size == 2) addressAndPrefixLength[1].toIntOrNull() ?: 0
             else 0
 
-        IPv4Util.tryParseAddress(addressAndPrefixLength[0], networkAddress)
+        if ((!IPv4Util.tryParseAddress(
+                addressAndPrefixLength[0],
+                networkAddress
+            ) || networkBits == 0) && getShowNetworkAddress()
+        ) {
+            validateNetworkString(true)
+            return
+        }
+        if (_lowerBound < 0 && getShowLowerBound()) {
+            validateLowerBound(true)
+            return
+        }
+        if (getShowUpperBound() && (_upperBound < 0 || (_upperBound < _lowerBound && getShowLowerBound()))) {
+            validateUpperBound(true)
+            return
+        }
 
         _aces.clear()
         when (_wildcardMethod) {
@@ -199,15 +215,15 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
                         networkBits
                     )
 
-                    WildcardMethods.Lower -> WildcardUtil.getGreaterThanBoundACEs(
+                    WildcardMethods.Lower -> WildcardUtil.getSmallerThanBoundACEs(
                         networkAddress,
-                        _lowerBound.toUInt(),
+                        _upperBound.toUInt(),
                         networkBits
                     )
 
-                    else -> WildcardUtil.getSmallerThanBoundACEs(
+                    else -> WildcardUtil.getGreaterThanBoundACEs(
                         networkAddress,
-                        _upperBound.toUInt(),
+                        _lowerBound.toUInt(),
                         networkBits
                     )
                 }
@@ -227,12 +243,23 @@ class WildcardViewModel(app: Application) : AndroidViewModel(app), Observable {
             _aces.clear()
             _recyclerAdapter.notifyDataSetChanged()
             setLowerBound(0L)
+            validateLowerBound(false)
             setUpperBound(0L)
+            validateUpperBound(false)
             setNetworkString(DEFAULT_WILDCARD_NETWORK_ADDRESS)
+            validateNetworkString(false)
             setNetworkClass(NetworkClass.A)
 
             setCanReset(false)
         }
+    }
+
+    // UI
+    @SuppressLint("NotifyDataSetChanged")
+    fun setAdapter(adapter: WildcardItemAdapter) {
+        _recyclerAdapter = adapter
+        _recyclerAdapter.submitList(_aces)
+        _recyclerAdapter.notifyDataSetChanged()
     }
 
     private fun notifyPropertyChanged(fieldId: Int) {

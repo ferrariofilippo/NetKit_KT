@@ -18,7 +18,7 @@ import com.ferrariofilippo.netkit.model.data.ACE
 class WildcardItemAdapter :
     ListAdapter<ACE, WildcardItemAdapter.WildcardItemViewHolder>(WildcardItemComparator()) {
     override fun onBindViewHolder(
-        holder: WildcardItemAdapter.WildcardItemViewHolder,
+        holder: WildcardItemViewHolder,
         position: Int
     ) {
         holder.bind(getItem(position))
@@ -27,7 +27,7 @@ class WildcardItemAdapter :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): WildcardItemAdapter.WildcardItemViewHolder {
+    ): WildcardItemViewHolder {
         return WildcardItemViewHolder.create(parent)
     }
 

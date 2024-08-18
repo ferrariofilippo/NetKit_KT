@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2024 Filippo Ferrario -->
 <!-- Licensed under the MIT License. See the LICENSE. -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -9,22 +9,42 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/about_button"
-        style="?attr/materialIconButtonFilledTonalStyle"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/about"
-        app:icon="@drawable/outline_info_24" />
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp">
+
+        <TextView
+            android:id="@+id/pageTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="8dp"
+            android:contentDescription="@string/active_page_title"
+            android:text="@string/subnets"
+            android:textAppearance="?attr/textAppearanceHeadline4"
+            android:textColor="?attr/colorPrimary" />
+
+        <Button
+            android:id="@+id/about_button"
+            style="?attr/materialIconButtonFilledTonalStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:contentDescription="@string/about"
+            app:icon="@drawable/outline_info_24" />
+    </RelativeLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/viewContainer"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginVertical="64dp"
+        android:layout_height="0dp"
+        android:layout_above="@id/bottom_navigation_menu"
+        android:layout_below="@id/titleBar"
         android:layout_marginHorizontal="12dp"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
@@ -33,7 +53,8 @@
         android:id="@+id/bottom_navigation_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_navigation_menu" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

@@ -10,7 +10,6 @@ import com.ferrariofilippo.netkit.Constants.BYTES_IN_ADDRESS
 import com.ferrariofilippo.netkit.Constants.LAST_ADDRESS_BIT_INDEX
 import com.ferrariofilippo.netkit.Constants.LAST_BIT_INDEX
 import com.ferrariofilippo.netkit.Constants.SUBNET_SIZES_COUNT
-import kotlin.experimental.or
 
 object IPv4Util {
     private val subnetMaxHosts: Array<UInt>
@@ -79,6 +78,6 @@ object IPv4Util {
     fun getHostsCountByPrefixLength(prefixLength: Int): UInt {
         val i = SUBNET_SIZES_COUNT - 1 - prefixLength
 
-        return if (i >= 0) subnetMaxHosts[0] else 0u
+        return if (i >= 0) subnetMaxHosts[i] else 0u
     }
 }

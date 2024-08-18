@@ -8,6 +8,7 @@ package com.ferrariofilippo.netkit
 object Constants {
     const val SUBNET_SIZES_COUNT = 31
     const val BITS_IN_BYTE = 8
+    @Suppress("ConstPropertyName")
     const val BITS_IN_IPv4_ADDRESS = 32
     const val LAST_ADDRESS_BIT_INDEX = 31
     const val BYTES_IN_ADDRESS = 4
@@ -17,6 +18,7 @@ object Constants {
     const val LAST_HEXTET_INDEX = 7
     const val OMISSION_START_KEY = 0
     const val OMISSION_LENGTH_KEY = 1
+    @Suppress("ConstPropertyName")
     const val BITS_IN_IPv6_COMPONENT = 16
 
     const val ZERO_STR = "0"

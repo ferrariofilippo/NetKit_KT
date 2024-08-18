@@ -18,7 +18,7 @@ object IPv6Util {
 
         for (i in 0 until length) {
             components[i] =
-                if (components[i].isNullOrBlank()) ZERO_STR else omitLeadingZeroes(components[i])
+                if (components[i].isBlank()) ZERO_STR else omitLeadingZeroes(components[i])
         }
 
         var j = 0
@@ -40,7 +40,7 @@ object IPv6Util {
         }
 
         for (i in 0 until params[OMISSION_LENGTH_KEY]) {
-            components[i + params[OMISSION_START_KEY]] = ZERO_STR
+            components[i + params[OMISSION_START_KEY]] = ""
         }
 
         j = 0
@@ -74,7 +74,7 @@ object IPv6Util {
 
         for (i in compressed.indices) {
             if (compressed[i].isEmpty()) {
-                for (j in 0 until removedSegmentsCount) {
+                for (j in 0..removedSegmentsCount) {
                     result.add(ZERO_STR)
                 }
             } else {
@@ -90,13 +90,17 @@ object IPv6Util {
             return false
         }
 
-        val split = address.split(':')
-        if (split.size != HEXTET_IN_ADDRESS || segments.size != HEXTET_IN_ADDRESS) {
+        val split = (
+                if (address.endsWith("::")) address.substring(0, address.length - 1)
+                else address
+                ).split(':')
+        val expanded = expandAddress(split)
+        if (expanded.size != HEXTET_IN_ADDRESS || segments.size != HEXTET_IN_ADDRESS) {
             return false
         }
 
-        for (i in split.indices) {
-            segments[i] = split[i]
+        for (i in expanded.indices) {
+            segments[i] = expanded[i]
         }
 
         return true

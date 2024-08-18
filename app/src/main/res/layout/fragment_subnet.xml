@@ -6,7 +6,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="vm"
             type="com.ferrariofilippo.netkit.viewmodel.SubnetViewModel" />
@@ -20,8 +22,8 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="96dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/ipVersionPicker"
@@ -42,7 +44,8 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginTop="12dp"
                 android:text="@string/sizes"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+                android:textAppearance="?attr/textAppearanceHeadline4"
+                android:visibility="@{vm.ipVersionIndex == 0 ? View.VISIBLE : View.GONE}" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/sizesRecyclerView"
@@ -64,28 +67,14 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:digits="0123456789AaBbCcDdEeFf:"
                     android:inputType="text"
+                    android:maxLength="40"
                     android:text="@={vm.iPv6Address}" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/ipv6SubnetsCountInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="4dp"
-                android:hint="@string/global_routing_prefix"
-                android:visibility="@{vm.ipVersionIndex == 1 ? View.VISIBLE : View.GONE}"
-                app:endIconMode="clear_text">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="number"
-                    android:text="@={`` + vm.globalRoutingPrefix}" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/globalRoutingPrefixInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
@@ -100,6 +89,22 @@
                     android:text="@={`` + vm.subnetsCountV6}" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/globalRoutingPrefixInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:hint="@string/global_routing_prefix"
+                android:visibility="@{vm.ipVersionIndex == 1 ? View.VISIBLE : View.GONE}"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="number"
+                    android:text="@={`` + vm.globalRoutingPrefix}" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -108,7 +113,7 @@
 
                 <Button
                     android:id="@+id/resetSubnetsButton"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
@@ -117,7 +122,7 @@
 
                 <Button
                     android:id="@+id/computeSubnetsButton"
-                    style="?attr/materialButtonStyle"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/compute" />
@@ -134,6 +139,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
+                android:visibility="@{vm.ipVersionIndex == 0 ? View.VISIBLE : View.GONE}"
+                tools:listitem="@layout/subnet_item" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/subnetsIPv6RecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:visibility="@{vm.ipVersionIndex == 1 ? View.VISIBLE : View.GONE}"
                 tools:listitem="@layout/subnet_item" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>

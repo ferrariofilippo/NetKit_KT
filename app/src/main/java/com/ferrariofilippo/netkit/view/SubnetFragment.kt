@@ -11,12 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ferrariofilippo.netkit.R
 import com.ferrariofilippo.netkit.adapters.SizeItemAdapter
 import com.ferrariofilippo.netkit.adapters.SubnetItemAdapter
+import com.ferrariofilippo.netkit.adapters.SubnetV6ItemAdapter
 import com.ferrariofilippo.netkit.databinding.FragmentSubnetBinding
 import com.ferrariofilippo.netkit.viewmodel.SubnetViewModel
 
@@ -30,6 +31,7 @@ class SubnetFragment : Fragment() {
     private var _binding: FragmentSubnetBinding? = null
     private val binding get() = _binding!!
 
+    // Overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[SubnetViewModel::class.java]
@@ -56,19 +58,24 @@ class SubnetFragment : Fragment() {
         _binding = null
     }
 
+    // UI
     private fun setupRecyclers() {
         val sizesAdapter = SizeItemAdapter {
             viewModel.formatList()
         }
         val subnetsAdapter = SubnetItemAdapter()
+        val subnetsV6Adapter = SubnetV6ItemAdapter()
 
-        viewModel.setAdapters(sizesAdapter, subnetsAdapter)
+        viewModel.setAdapters(sizesAdapter, subnetsAdapter, subnetsV6Adapter)
 
         binding.sizesRecyclerView.adapter = sizesAdapter
         binding.sizesRecyclerView.layoutManager = LinearLayoutManager(context)
 
         binding.subnetsRecyclerView.adapter = subnetsAdapter
         binding.subnetsRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        binding.subnetsIPv6RecyclerView.adapter = subnetsV6Adapter
+        binding.subnetsIPv6RecyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     private fun setupUI() {
@@ -97,5 +104,29 @@ class SubnetFragment : Fragment() {
         binding.resetSubnetsButton.setOnClickListener {
             viewModel.reset()
         }
+
+        viewModel.validateIPv6IPAddress = ::ipv6ManageIPAddressError
+        viewModel.validateIPv6GlobalRoutingPrefix = ::ipv6ManageGlobalRoutingPrefixError
+        viewModel.validateIPv6SubnetsCount = ::ipv6ManageSubnetsCountError
+    }
+
+    // Validation
+    // IPv6
+    private fun ipv6ManageIPAddressError(error: Boolean) {
+        binding.ipv6AddressInput.error =
+            if (error) getString(R.string.invalid_ip)
+            else null
+    }
+
+    private fun ipv6ManageGlobalRoutingPrefixError(error: Boolean) {
+        binding.globalRoutingPrefixInput.error =
+            if (error) getString(R.string.invalid_prefix)
+            else null
+    }
+
+    private fun ipv6ManageSubnetsCountError(error: Boolean) {
+        binding.ipv6SubnetsCountInput.error =
+            if (error) getString(R.string.invalid_subnet_count)
+            else null
     }
 }

@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ferrariofilippo.netkit.R
 import com.ferrariofilippo.netkit.adapters.WildcardItemAdapter
 import com.ferrariofilippo.netkit.databinding.FragmentWildcardBinding
 import com.ferrariofilippo.netkit.model.enums.NetworkClass
@@ -26,6 +27,7 @@ class WildcardFragment : Fragment() {
     private var _binding: FragmentWildcardBinding? = null
     private val binding get() = _binding!!
 
+    // Overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[WildcardViewModel::class.java]
@@ -52,6 +54,7 @@ class WildcardFragment : Fragment() {
         _binding = null
     }
 
+    // UI
     private fun setupUI() {
         setupMethodPicker()
         setupClassPicker()
@@ -62,6 +65,10 @@ class WildcardFragment : Fragment() {
         binding.computeWildcardsButton.setOnClickListener {
             viewModel.compute()
         }
+
+        viewModel.validateLowerBound = ::manageLowerBoundError
+        viewModel.validateUpperBound = ::manageUpperBoundError
+        viewModel.validateNetworkString = ::manageNetworkAddressError
 
         setupRecycler()
     }
@@ -102,5 +109,24 @@ class WildcardFragment : Fragment() {
         viewModel.setAdapter(adapter)
         binding.wildcardsRecyclerView.adapter = adapter
         binding.wildcardsRecyclerView.layoutManager = LinearLayoutManager(context)
+    }
+
+    // Validation
+    private fun manageLowerBoundError(error: Boolean) {
+        binding.wildcardLowerBoundInput.error =
+            if (error) getString(R.string.invalid_lower_bound)
+            else null
+    }
+
+    private fun manageUpperBoundError(error: Boolean) {
+        binding.wildcardUpperBoundInput.error =
+            if (error) getString(R.string.invalid_upper_bound)
+            else null
+    }
+
+    private fun manageNetworkAddressError(error: Boolean) {
+        binding.wildcardNetworkAddressInput.error =
+            if (error) getString(R.string.invalid_network_address)
+            else null
     }
 }

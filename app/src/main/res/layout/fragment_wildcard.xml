@@ -73,14 +73,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:hint="@string/wildcard_network_hint"
+                android:hint="@string/network_address"
                 android:visibility="@{vm.showNetworkAddress ? View.VISIBLE : View.GONE}"
                 app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:inputType="number"
+                    android:inputType="text"
+                    android:digits="0123456789./"
                     android:text="@={vm.networkString}" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,12 +103,12 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginVertical="8dp"
                 android:gravity="center">
 
                 <Button
                     android:id="@+id/resetWildcardsButton"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
@@ -116,7 +117,7 @@
 
                 <Button
                     android:id="@+id/computeWildcardsButton"
-                    style="?attr/materialButtonStyle"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/compute" />

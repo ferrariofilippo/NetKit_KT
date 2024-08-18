@@ -7,11 +7,9 @@ package com.ferrariofilippo.netkit.adapters
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import androidx.core.text.isDigitsOnly
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -22,17 +20,17 @@ import com.ferrariofilippo.netkit.util.IPv4Util
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-class SizeItemAdapter(private val focusLostCallback: () -> Unit) :
+class SizeItemAdapter(private val textChangedCallback: () -> Unit) :
     ListAdapter<SizeInfo, SizeItemAdapter.SizeItemViewHolder>(SizeItemComparator()) {
     override fun onBindViewHolder(holder: SizeItemViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SizeItemViewHolder {
-        return SizeItemViewHolder.create(parent, focusLostCallback)
+        return SizeItemViewHolder.create(parent, textChangedCallback)
     }
 
-    class SizeItemViewHolder(itemView: View, focusLostCallback: () -> Unit) :
+    class SizeItemViewHolder(itemView: View, textChangedCallback: () -> Unit) :
         RecyclerView.ViewHolder(itemView) {
         private val _sizeInput = itemView.findViewById<TextInputLayout>(R.id.sizeTextInput)
         private var _info: SizeInfo? = null
@@ -41,23 +39,12 @@ class SizeItemAdapter(private val focusLostCallback: () -> Unit) :
             _sizeInput.setEndIconOnClickListener {
                 _sizeInput.editText?.text?.clear()
                 syncData()
-                focusLostCallback()
+                textChangedCallback()
             }
             _sizeInput.editText?.setOnFocusChangeListener { _, focus ->
                 if (!focus) {
-                    focusLostCallback()
+                    textChangedCallback()
                 }
-            }
-            _sizeInput.editText?.setOnEditorActionListener { _, actionId, event ->
-                var handled = false
-                if (actionId == EditorInfo.IME_ACTION_DONE ||
-                    (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)
-                ) {
-                    focusLostCallback()
-                    handled = true
-                }
-
-                handled
             }
             _sizeInput.editText?.addTextChangedListener(object : TextWatcher {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -68,6 +55,7 @@ class SizeItemAdapter(private val focusLostCallback: () -> Unit) :
 
                 override fun afterTextChanged(s: Editable?) {
                     syncData()
+                    textChangedCallback()
                 }
             })
         }
@@ -98,13 +86,13 @@ class SizeItemAdapter(private val focusLostCallback: () -> Unit) :
         }
 
         companion object {
-            fun create(parent: ViewGroup, focusLostCallback: () -> Unit): SizeItemViewHolder {
+            fun create(parent: ViewGroup, textChangedCallback: () -> Unit): SizeItemViewHolder {
                 val view: View =
                     LayoutInflater
                         .from(parent.context)
                         .inflate(R.layout.size_item, parent, false)
 
-                return SizeItemViewHolder(view, focusLostCallback)
+                return SizeItemViewHolder(view, textChangedCallback)
             }
         }
     }

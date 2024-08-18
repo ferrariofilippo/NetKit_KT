@@ -1,19 +1,19 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Copyright (c) 2024 Filippo Ferrario -->
     <!-- Licensed under the MIT License. See the LICENSE. -->
     <style name="Theme.NetKit" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/red_200</item>
-        <item name="colorPrimaryVariant">@color/red_700</item>
+        <item name="colorPrimary">@color/cyan_300</item>
+        <item name="colorPrimaryVariant">@color/cyan_500</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/cyan_200</item>
-        <item name="colorSecondaryVariant">@color/cyan_200</item>
+        <item name="colorSecondary">@color/red_200</item>
+        <item name="colorSecondaryVariant">@color/red_500</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Others -->
-        <item name="colorSecondaryContainer">@color/red_50</item>
+        <item name="colorSecondaryContainer">@color/cyan_900</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

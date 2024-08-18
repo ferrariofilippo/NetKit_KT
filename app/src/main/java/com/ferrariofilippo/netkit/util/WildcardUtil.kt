@@ -5,21 +5,21 @@
 
 package com.ferrariofilippo.netkit.util
 
+import com.ferrariofilippo.netkit.Constants.BITS_IN_BYTE
+import com.ferrariofilippo.netkit.Constants.BITS_IN_IPv4_ADDRESS
+import com.ferrariofilippo.netkit.Constants.BYTES_IN_ADDRESS
+import com.ferrariofilippo.netkit.Constants.LAST_ADDRESS_BIT_INDEX
 import com.ferrariofilippo.netkit.model.data.ACE
 import com.ferrariofilippo.netkit.model.data.Bounds
 import com.ferrariofilippo.netkit.model.enums.NetworkClass
 
 object WildcardUtil {
-    private const val LAST_ADDRESS_BITS_INDEX = 31
-    private const val ADDRESS_BITS = 32
-    private const val BITS_IN_BYTE = 8
-
-    private val _evenOrOddWildcard = arrayOf<UByte>(0xFFu, 0xFFu, 0xFFu, 0xFEu)
+    private val _evenOrOddWildcard = arrayOf<UByte>(0xFFu, 0xFFu, 0xFFu, 0xFFu)
 
     private val _classAWildcard = arrayOf<UByte>(0x7Fu, 0xFFu, 0xFFu, 0xFFu)
     private val _classBWildcard = arrayOf<UByte>(0x3Fu, 0xFFu, 0xFFu, 0xFFu)
-    private val _classCWildcard = arrayOf<UByte>(0x3Fu, 0xFFu, 0xFFu, 0xFFu)
-    private val _classDWildcard = arrayOf<UByte>(0x1Fu, 0xFFu, 0xFFu, 0xFFu)
+    private val _classCWildcard = arrayOf<UByte>(0x1Fu, 0xFFu, 0xFFu, 0xFFu)
+    private val _classDWildcard = arrayOf<UByte>(0x0Fu, 0xFFu, 0xFFu, 0xFFu)
     private val _classEWildcard = arrayOf<UByte>(0x0Fu, 0xFFu, 0xFFu, 0xFFu)
 
     private val _classASupportIP = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u)
@@ -35,10 +35,14 @@ object WildcardUtil {
         }
 
         val i = networkBitsCount / BITS_IN_BYTE
-        if (isEven) {
-            networkAddress[i] = networkAddress[i] and 0xFEu
-        } else {
-            networkAddress[i] = networkAddress[i] or 1u
+        for (j in i until BYTES_IN_ADDRESS) {
+            if (isEven) {
+                networkAddress[j] = networkAddress[j] and 0xFEu
+            } else {
+                networkAddress[j] = networkAddress[j] or 1u
+            }
+
+            mask[j] = 0xFEu
         }
 
         return createACE(networkAddress, mask)
@@ -91,26 +95,36 @@ object WildcardUtil {
         lowerBound: UInt,
         networkBitsCount: Int
     ): List<ACE> {
-        val exponent = MathUtil.getCeilBaseTwoLog(lowerBound)
-        if (exponent <= 0) {
-            return listOf()
-        }
+        val aces = mutableListOf<ACE>()
 
-        val bounds = Bounds(lowerBound, MathUtil.powersOfTwo[exponent])
-        val roundedLowerBound = lowerBound + lowerBound % 2u
-        val byteIndex = 3 - (exponent / BITS_IN_BYTE)
-        val roundedExponent = exponent - (exponent % BITS_IN_BYTE)
+        val indexComplement = MathUtil.getCeilBaseTwoLog(lowerBound) / (BITS_IN_BYTE + 1)
+        val byteIndex = 3 - indexComplement
+        var exponent = (indexComplement + 1) * 8
+        var upperBound = MathUtil.powersOfTwo[exponent]
+        var lastSetBitIndex = exponent
+
         val wildcard = getNetworkWildcard(networkBitsCount)
-        val aces = mutableListOf(getBiggestACE(exponent, wildcard, networkAddress))
+        val mask = networkAddress.copyOf()
+        val hostIP = wildcard.copyOf()
 
-        while (bounds.upper > roundedLowerBound) {
-            aces.add(getGreaterThanBoundACE(networkAddress, wildcard, bounds, exponent))
-        }
+        while (upperBound > (lowerBound + 1u) && lastSetBitIndex > 0) {
+            for (i in networkAddress.indices) {
+                hostIP[i] = networkAddress[i]
+                mask[i] = wildcard[i]
+            }
 
-        wildcard[byteIndex] = 0u
-        while (--bounds.upper >= bounds.lower) {
-            networkAddress[byteIndex] = (bounds.upper shr roundedExponent).toUByte()
-            aces.add(createACE(networkAddress, wildcard))
+            while (exponent > 0 && (upperBound - MathUtil.powersOfTwo[--exponent]) < lowerBound) {
+                lastSetBitIndex = exponent
+            }
+
+            upperBound -= MathUtil.powersOfTwo[exponent]
+            hostIP[byteIndex] =
+                ((upperBound + if (upperBound == lowerBound) 1u else 0u) shr ((3 - byteIndex) * 8)).toUByte()
+            mask[byteIndex] =
+                if (upperBound == lowerBound) 0u
+                else ((MathUtil.powersOfTwo[exponent] - 1u) shr ((3 - byteIndex) * 8)).toUByte()
+
+            aces.add(createACE(hostIP, mask))
         }
 
         return aces
@@ -121,27 +135,46 @@ object WildcardUtil {
         upperBound: UInt,
         networkBitsCount: Int
     ): List<ACE> {
-        val exponent = MathUtil.getFloorBaseTwoLog(upperBound)
-        if (exponent <= 0) {
-            return listOf()
+        val aces = mutableListOf<ACE>()
+        if (upperBound == 0u) {
+            return aces
         }
 
-        val bounds = Bounds(MathUtil.powersOfTwo[exponent], upperBound)
-        val roundedUpperBound = upperBound + upperBound % 2u
-        val byteIndex = 3 - (exponent / BITS_IN_BYTE)
-        val roundedExponent = exponent - (exponent % BITS_IN_BYTE)
+        var exponent = MathUtil.getFloorBaseTwoLog(upperBound)
+        var lowerBound = MathUtil.powersOfTwo[exponent]
+        val byteIndex = 3 - exponent / (BITS_IN_BYTE + 1)
         val wildcard = getNetworkWildcard(networkBitsCount)
-        val aces =
-            mutableListOf(getBiggestACEWithUpperBound(exponent, wildcard, networkAddress))
 
-        while (bounds.lower < roundedUpperBound) {
-            aces.add(getSmallerThanBoundACE(networkAddress, wildcard, bounds, exponent))
-        }
+        // Smaller than 2^exponent ACE
+        val mask = networkAddress.copyOf()
+        val hostIP = wildcard.copyOf()
+        hostIP[byteIndex] = 0u
+        mask[byteIndex] = (lowerBound - 1u).toUByte()
+        aces.add(createACE(hostIP, mask))
 
-        wildcard[byteIndex] = 0u
-        while (++bounds.lower <= bounds.upper) {
-            networkAddress[byteIndex] = (bounds.lower shr roundedExponent).toUByte()
-            aces.add(createACE(networkAddress, wildcard))
+        // Greater than 2^exponent ACEs
+        var lastSetBitIndex = exponent
+        var forceACE = lowerBound < upperBound
+
+        while ((forceACE || lowerBound < (upperBound - 1u)) && lastSetBitIndex > 0) {
+            for (i in networkAddress.indices) {
+                hostIP[i] = networkAddress[i]
+                mask[i] = wildcard[i]
+            }
+
+            exponent = lastSetBitIndex
+            while (exponent > 0 && (lowerBound + MathUtil.powersOfTwo[--exponent]) > upperBound) {
+                lastSetBitIndex = exponent
+            }
+
+            hostIP[byteIndex] = (lowerBound shr ((3 - byteIndex) * 8)).toUByte()
+            mask[byteIndex] =
+                ((MathUtil.powersOfTwo[exponent] - 1u) shr ((3 - byteIndex) * 8)).toUByte()
+
+            lowerBound += MathUtil.powersOfTwo[exponent]
+            forceACE = lowerBound == (upperBound - 1u) && lastSetBitIndex > 1
+
+            aces.add(createACE(hostIP, mask))
         }
 
         return aces
@@ -162,40 +195,83 @@ object WildcardUtil {
         }
 
         val wildcard = getNetworkWildcard(networkBitsCount)
+        val mask = networkAddress.copyOf()
+        val hostIP = wildcard.copyOf()
+
         var lowerExponent = MathUtil.getCeilBaseTwoLog(bounds.lower)
-        val upperExponent = MathUtil.getFloorBaseTwoLog(bounds.upper)
-        val medianPowerOfTwo = MathUtil.powersOfTwo[lowerExponent]
-        if (upperExponent > lowerExponent + 1) {
-            val upperHalfBounds = Bounds(medianPowerOfTwo, bounds.upper)
-            val lowerHalfBounds = Bounds(bounds.lower, medianPowerOfTwo)
+        var higherExponent = MathUtil.getFloorBaseTwoLog(bounds.upper)
+        var roundedLower = MathUtil.powersOfTwo[lowerExponent]
+        var roundedHigher = MathUtil.powersOfTwo[higherExponent]
 
-            while (upperHalfBounds.upper > upperHalfBounds.lower) {
-                aces.add(
-                    getGreaterThanBoundACE(
-                        networkAddress,
-                        wildcard,
-                        upperHalfBounds,
-                        upperExponent
-                    )
-                )
-            }
-            while (lowerHalfBounds.lower < lowerHalfBounds.upper) {
-                aces.add(
-                    getSmallerThanBoundACE(
-                        networkAddress,
-                        wildcard,
-                        lowerHalfBounds,
-                        lowerExponent
-                    )
-                )
+        var byteIndex = 3 - lowerExponent / (BITS_IN_BYTE + 1)
+
+        // Handle low
+        // This is not redundant, it's needed in the "Handle mid" section below
+        var lowerExpCopy = lowerExponent
+        var lastSetBitIndex = lowerExponent
+
+        while (roundedLower > (bounds.lower + 1u) && lastSetBitIndex > 0) {
+            for (i in networkAddress.indices) {
+                hostIP[i] = networkAddress[i]
+                mask[i] = wildcard[i]
             }
 
-        } else {
-            // TODO: Doesn't merge ACEs when it could
-            ++lowerExponent
-            while (bounds.lower < bounds.upper) {
-                aces.add(getSmallerThanBoundACE(networkAddress, wildcard, bounds, lowerExponent))
+            while (lowerExpCopy > 0 && (roundedLower - MathUtil.powersOfTwo[--lowerExpCopy]) < bounds.lower) {
+                lastSetBitIndex = lowerExpCopy
             }
+
+            roundedLower -= MathUtil.powersOfTwo[lowerExpCopy]
+            hostIP[byteIndex] =
+                ((roundedLower + if (roundedLower == bounds.lower) 1u else 0u) shr ((3 - byteIndex) * 8)).toUByte()
+            mask[byteIndex] =
+                if (roundedLower == bounds.lower) 0u
+                else ((MathUtil.powersOfTwo[lowerExpCopy] - 1u) shr ((3 - byteIndex) * 8)).toUByte()
+
+            aces.add(0, createACE(hostIP, mask))
+        }
+
+        // Handle mid
+        roundedLower = MathUtil.powersOfTwo[lowerExponent]
+        if (lowerExponent != higherExponent) {
+            while (roundedLower < roundedHigher) {
+                for (i in networkAddress.indices) {
+                    hostIP[i] = networkAddress[i]
+                    mask[i] = wildcard[i]
+                }
+
+                byteIndex = 3 - lowerExponent / (BITS_IN_BYTE + 1)
+                hostIP[byteIndex] = (roundedLower shr ((3 - byteIndex) * 8)).toUByte()
+                mask[byteIndex] =
+                    ((MathUtil.powersOfTwo[lowerExponent] - 1u) shr ((3 - byteIndex) * 8)).toUByte()
+
+                aces.add(createACE(hostIP, mask))
+                roundedLower += MathUtil.powersOfTwo[lowerExponent++]
+            }
+        }
+
+        // Handle high
+        lastSetBitIndex = higherExponent
+        var forceACE = roundedHigher < bounds.upper
+
+        while ((forceACE || roundedHigher < (bounds.upper - 1u)) && lastSetBitIndex > 0) {
+            for (i in networkAddress.indices) {
+                hostIP[i] = networkAddress[i]
+                mask[i] = wildcard[i]
+            }
+
+            higherExponent = lastSetBitIndex
+            while (higherExponent > 0 && (roundedHigher + MathUtil.powersOfTwo[--higherExponent]) > bounds.upper) {
+                lastSetBitIndex = higherExponent
+            }
+
+            hostIP[byteIndex] = (roundedHigher shr ((3 - byteIndex) * 8)).toUByte()
+            mask[byteIndex] =
+                ((MathUtil.powersOfTwo[higherExponent] - 1u) shr ((3 - byteIndex) * 8)).toUByte()
+
+            roundedHigher += MathUtil.powersOfTwo[higherExponent]
+            forceACE = roundedHigher == (bounds.upper - 1u) && lastSetBitIndex > 1
+
+            aces.add(createACE(hostIP, mask))
         }
 
         return aces
@@ -203,11 +279,11 @@ object WildcardUtil {
 
     private fun getNetworkWildcard(networkBitsCount: Int): Array<UByte> {
         var mask = 0u
-        for (i in 0 until ADDRESS_BITS) {
+        for (i in 0 until BITS_IN_IPv4_ADDRESS) {
             if (i >= networkBitsCount) {
                 ++mask
             }
-            if (i != LAST_ADDRESS_BITS_INDEX) {
+            if (i != LAST_ADDRESS_BIT_INDEX) {
                 mask = mask shl 1
             }
         }
@@ -220,101 +296,7 @@ object WildcardUtil {
         )
     }
 
-    private fun getBiggestACE(exponent: Int, mask: Array<UByte>, networkAddress: Array<UByte>): ACE {
-        val byteIndex = 3 - exponent / BITS_IN_BYTE
-        val bitIndex = exponent % BITS_IN_BYTE
-        val tempMask = mask.copyOf()
-
-        tempMask[byteIndex] = tempMask[byteIndex] and MathUtil.powersOfTwo[bitIndex].inv().toUByte()
-        networkAddress[byteIndex] = MathUtil.powersOfTwo[bitIndex].toUByte()
-
-        return createACE(networkAddress, tempMask)
-    }
-
-    private fun getBiggestACEWithUpperBound(
-        exponent: Int,
-        mask: Array<UByte>,
-        networkAddress: Array<UByte>
-    ): ACE {
-        val byteIndex = 3 - exponent / BITS_IN_BYTE
-        val bitIndex = exponent % BITS_IN_BYTE
-        val tempMask = mask.copyOf()
-
-        tempMask[byteIndex] = tempMask[byteIndex] and (0xff shr (BITS_IN_BYTE - bitIndex)).toUByte()
-        networkAddress[byteIndex] = 0u
-
-        return createACE(networkAddress, tempMask)
-    }
-
-    private fun getGreaterThanBoundACE(
-        networkAddress: Array<UByte>,
-        mask: Array<UByte>,
-        bounds: Bounds,
-        readOnlyExp: Int
-    ): ACE {
-        val byteIndex = 3 - readOnlyExp / BITS_IN_BYTE
-        val roundedExponent = readOnlyExp - (readOnlyExp % BITS_IN_BYTE) // To get a multiple of 8
-        var addressesSum = 0u
-        var setBits = 0u
-        var exponent = readOnlyExp
-
-        for (i in LAST_ADDRESS_BITS_INDEX downTo exponent) {
-            setBits += MathUtil.powersOfTwo[i]
-        }
-
-        --exponent
-
-        while (addressesSum < bounds.lower && exponent >= 0) {
-            setBits += MathUtil.powersOfTwo[exponent]
-            if ((addressesSum + MathUtil.powersOfTwo[exponent]) < bounds.upper) {
-                addressesSum += MathUtil.powersOfTwo[exponent]
-            }
-
-            --exponent
-        }
-
-        val tempMask = mask.copyOf()
-        val unsetBits = setBits.inv() shr roundedExponent
-
-        tempMask[byteIndex] = tempMask[byteIndex] and unsetBits.toUByte()
-        networkAddress[byteIndex] = (addressesSum shr roundedExponent).toUByte()
-        bounds.upper = addressesSum
-
-        return createACE(networkAddress, tempMask)
-    }
-
-    private fun getSmallerThanBoundACE(
-        networkAddress: Array<UByte>,
-        mask: Array<UByte>,
-        bounds: Bounds,
-        readOnlyExp: Int
-    ): ACE {
-        val byteIndex = 3 - readOnlyExp / BITS_IN_BYTE
-        val roundedExponent = readOnlyExp - (readOnlyExp % BITS_IN_BYTE) // To get a multiple of 8
-        val addressesSum = bounds.lower
-        var setBits = 0u
-        var exponent = readOnlyExp - 1
-
-        for (i in LAST_ADDRESS_BITS_INDEX downTo exponent) {
-            setBits += MathUtil.powersOfTwo[i]
-        }
-
-        while (exponent >= 0 && (addressesSum + MathUtil.powersOfTwo[exponent]) > bounds.upper) {
-            --exponent
-            setBits += MathUtil.powersOfTwo[exponent]
-        }
-
-        val tempMask = mask.copyOf()
-        val unsetBits = setBits.inv() shr roundedExponent
-
-        tempMask[byteIndex] = tempMask[byteIndex] and unsetBits.toUByte()
-        networkAddress[byteIndex] = (addressesSum shr roundedExponent).toUByte()
-        bounds.lower = addressesSum + MathUtil.powersOfTwo[exponent]
-
-        return createACE(networkAddress, tempMask)
-    }
-
     private fun createACE(networkAddress: Array<UByte>, wildcard: Array<UByte>): ACE {
-        return ACE(networkAddress.joinToString("."), wildcard.joinToString("."))
+        return ACE(wildcard.joinToString("."), networkAddress.joinToString("."))
     }
 }
