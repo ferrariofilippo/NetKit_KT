@@ -44,7 +44,7 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginTop="12dp"
                 android:text="@string/sizes"
-                android:textAppearance="?attr/textAppearanceHeadline4"
+                android:textAppearance="?attr/textAppearanceHeadline5"
                 android:visibility="@{vm.ipVersionIndex == 0 ? View.VISIBLE : View.GONE}" />
 
             <androidx.recyclerview.widget.RecyclerView

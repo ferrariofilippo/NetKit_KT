@@ -37,13 +37,11 @@ class AboutFragment : Fragment() {
     // UIs
     private fun setupUI() {
         binding.privacyButton.setOnClickListener {
-            // TODO: Set appropriate link
             val uri = Uri.parse("https://netkit.vercel.app/privacy")
             startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
         binding.reportBugButton.setOnClickListener {
-            // TODO: Set appropriate link
-            val uri = Uri.parse("https://github.com/ferrariofilippo/NetKit_Release/issues/new")
+            val uri = Uri.parse("https://github.com/ferrariofilippo/NetKit_KT/issues/new")
             startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
     }
