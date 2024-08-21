@@ -5,9 +5,7 @@
 
 package com.ferrariofilippo.netkit
 
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -19,6 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.navigationrail.NavigationRailView
 
 class MainActivity : AppCompatActivity() {
     // Overrides
@@ -32,12 +31,16 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        findViewById<NavigationBarView>(R.id.bottom_navigation_menu).setOnItemSelectedListener {
+        findViewById<NavigationBarView>(R.id.bottom_navigation_menu)?.setOnItemSelectedListener {
+            onMenuItemSelected(it)
+        }
+
+        findViewById<NavigationRailView>(R.id.navigation_rail)?.setOnItemSelectedListener {
             onMenuItemSelected(it)
         }
 
         val aboutButton = findViewById<Button>(R.id.about_button)
-        aboutButton.setOnClickListener {
+        aboutButton?.setOnClickListener {
             findNavController(R.id.viewContainer).navigate(R.id.aboutFragment)
             setPageTitle(R.id.aboutFragment)
             aboutButton.visibility = View.GONE
@@ -50,9 +53,11 @@ class MainActivity : AppCompatActivity() {
                 setPageTitle(
                     navController.currentBackStackEntry?.destination?.id ?: R.id.subnetFragment
                 )
-                aboutButton.visibility =
-                    if (navController.currentBackStackEntry?.destination?.id == R.id.aboutFragment) View.GONE
-                    else View.VISIBLE
+                if (aboutButton != null) {
+                    aboutButton.visibility =
+                        if (navController.currentBackStackEntry?.destination?.id == R.id.aboutFragment) View.GONE
+                        else View.VISIBLE
+                }
             }
         })
     }
@@ -61,9 +66,10 @@ class MainActivity : AppCompatActivity() {
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.viewContainer)
         val destination = when (item.itemId) {
-            R.id.subnet_bottom_menu_button -> R.id.subnetFragment
-            R.id.tools_bottom_menu_button -> R.id.toolsFragment
-            R.id.wildcards_bottom_menu_button -> R.id.wildcardFragment
+            R.id.subnet_bottom_menu_button, R.id.subnet_rail_menu_button -> R.id.subnetFragment
+            R.id.tools_bottom_menu_button, R.id.tools_rail_menu_button -> R.id.toolsFragment
+            R.id.wildcards_bottom_menu_button, R.id.wildcards_rail_menu_button -> R.id.wildcardFragment
+            R.id.about_rail_menu_button -> R.id.aboutFragment
             else -> null
         }
 
@@ -74,7 +80,9 @@ class MainActivity : AppCompatActivity() {
             navController.clearBackStack(destination)
             navController.navigate(destination)
             setPageTitle(destination)
-            aboutButton.visibility = View.VISIBLE
+            if (aboutButton != null) {
+                aboutButton.visibility = View.VISIBLE
+            }
 
             return true
         }
@@ -83,12 +91,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setPageTitle(fragmentId: Int) {
-        findViewById<TextView>(R.id.pageTitleTextView).text = getString(when (fragmentId) {
-            R.id.subnetFragment -> R.string.subnets
-            R.id.toolsFragment -> R.string.tools
-            R.id.wildcardFragment -> R.string.wildcards
-            R.id.aboutFragment -> R.string.about
-            else -> R.string.subnets
-        })
+        findViewById<TextView>(R.id.pageTitleTextView).text = getString(
+            when (fragmentId) {
+                R.id.subnetFragment -> R.string.subnets
+                R.id.toolsFragment -> R.string.tools
+                R.id.wildcardFragment -> R.string.wildcards
+                R.id.aboutFragment -> R.string.about
+                else -> R.string.subnets
+            }
+        )
     }
 }

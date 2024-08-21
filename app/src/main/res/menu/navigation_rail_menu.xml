@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2024 Filippo Ferrario -->
+<!-- Licensed under the MIT License. See the LICENSE. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/subnet_rail_menu_button"
+        android:enabled="true"
+        android:icon="@drawable/outline_lan_24"
+        android:title="@string/subnets" />
+    <item
+        android:id="@+id/tools_rail_menu_button"
+        android:enabled="true"
+        android:icon="@drawable/baseline_build_24"
+        android:title="@string/tools" />
+    <item
+        android:id="@+id/wildcards_rail_menu_button"
+        android:enabled="true"
+        android:icon="@drawable/outline_grass_24"
+        android:title="@string/wildcards" />
+    <item
+        android:id="@+id/about_rail_menu_button"
+        android:enabled="true"
+        android:icon="@drawable/outline_info_24"
+        android:title="@string/about" />
+</menu>
