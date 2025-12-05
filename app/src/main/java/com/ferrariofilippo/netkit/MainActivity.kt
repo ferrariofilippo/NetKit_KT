@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import com.ferrariofilippo.netkit.util.AgeSignalsUtil
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigationrail.NavigationRailView
 
@@ -25,12 +26,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setInsets()
 
+        AgeSignalsUtil.verifyUserAge(this) {
+            setupUI()
+        }
+    }
+
+    // UI
+    private fun setupUI() {
         findViewById<NavigationBarView>(R.id.bottom_navigation_menu)?.setOnItemSelectedListener {
             onMenuItemSelected(it)
         }
@@ -62,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // UI
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.viewContainer)
         val destination = when (item.itemId) {
@@ -100,5 +103,13 @@ class MainActivity : AppCompatActivity() {
                 else -> R.string.subnets
             }
         )
+    }
+
+    private fun setInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 }

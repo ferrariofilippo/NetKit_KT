@@ -23,3 +23,8 @@ local.properties
 *.hprof
 google-services.json
 /.idea/deploymentTargetDropDown.xml
+.idea/.name
+/.idea
+/.idea
+.idea/compiler.xml
+.idea/gradle.xml
