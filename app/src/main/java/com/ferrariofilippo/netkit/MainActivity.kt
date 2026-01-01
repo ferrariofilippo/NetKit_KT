@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Filippo Ferrario
+ * Copyright (c) 2026 Filippo Ferrario
  * Licensed under the MIT License. See the LICENSE.
  */
 
@@ -17,12 +17,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.ferrariofilippo.netkit.util.AgeSignalsUtil
+import com.ferrariofilippo.netkit.util.SettingsUtil
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigationrail.NavigationRailView
 
 class MainActivity : AppCompatActivity() {
     // Overrides
     override fun onCreate(savedInstanceState: Bundle?) {
+        val app = application as NetKitApplication
+        SettingsUtil.setStore(app)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
